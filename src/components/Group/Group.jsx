@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaSpinner } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 
@@ -56,9 +56,9 @@ const Group = () => {
                             <th>#</th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Phone</th>
                             <th>Categories</th>
-                            <th>update</th>
-                            <th>Delete</th>
+                            <th>Details</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -67,9 +67,9 @@ const Group = () => {
                             <th>{index + 1}</th>
                             <td>{contact?.name}</td>
                             <td>{contact?.email}</td>
+                            <td>{contact?.phone}</td>
                             <td>{contact?.categories}</td>
-                            <td><button onClick={() => navigate(`/update/${contact._id}`)} className="btn btn-success">update</button></td>
-                            <td><button onClick={() => deleteFunctino(contact._id)} className="btn btn-error">Delete</button></td>
+                            <td><Link to={`/details/${contact._id}`}><button className="btn btn-primary">Details</button></Link></td>
                         </tr>)}
 
                     </tbody>

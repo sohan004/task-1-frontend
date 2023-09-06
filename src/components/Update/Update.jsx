@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { useLoaderData } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
+import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../AuthProvider/AuthProvider';
 
 const options = [
     { value: 'Family', label: 'Family' },
@@ -23,21 +24,43 @@ const options = [
 
 
 const Update = () => {
+    const { user } = useContext(AuthContext)
+    const navigate = useNavigate();
+    const id = useParams().id
+    const [contactDetails, setContactDetails] = useState({})
 
-    const contactDetails = useLoaderData()
-    console.log(contactDetails);
 
-
-
-
-    const [categories, setCategories] = useState(contactDetails?.categories ? { value: contactDetails.categories, label: contactDetails.categories } : null);
-    const [name, setName] = useState(contactDetails?.name);
-    const [phone, setPhone] = useState(contactDetails?.phone);
-    const [email, setEmail] = useState(contactDetails?.email);
+    const [categories, setCategories] = useState(null);
+    const [name, setName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (!user) {
+            return
+        }
+        fetch(`http://localhost:5000/contacts/${id}?email=${user?.email}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data?.error) {
+                    navigate('/')
+                }
+                else {
+                    setContactDetails(data)
+                    setName(data.name)
+                    setPhone(data.phone)
+                    setEmail(data.email)
+                    setCategories({ value: data.categories, label: data.categories })
+                }
+            })
+    }, [user])
 
 
     const handleAddContact = (e) => {
+        if (!user) {
+            navigate('/login')
+        }
         setLoading(true);
         if (!name || !phone || !email || !categories) {
             setLoading(false);

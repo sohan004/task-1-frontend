@@ -8,6 +8,12 @@ import Add from './components/Add/Add.jsx'
 import AllContact from './components/AllContact/AllContact.jsx'
 import Update from './components/Update/Update.jsx'
 import Group from './components/Group/Group.jsx'
+import Login from './components/Account/Login.jsx'
+import Signup from './components/Account/Signup.jsx'
+import AuthProvider from './components/AuthProvider/AuthProvider.jsx'
+import MyContact from './components/MyContact/MyContact.jsx'
+import PerMission from './components/PerMission/PerMission.jsx'
+import Details from './components/Details/Details.jsx'
 
 const router = createBrowserRouter([
   {
@@ -31,16 +37,40 @@ const router = createBrowserRouter([
         element: <Group></Group>
       },
       {
+        path: '/my-contact',
+        element: <MyContact></MyContact>
+      },
+      {
+        path: '/permission-request',
+        element: <PerMission></PerMission>
+      },
+      {
         path: '/update/:id',
-        element: <Update></Update>,
-        loader: ({params}) => fetch(`http://localhost:5000/contacts/${params.id}`)
-      }
+        element: <Update></Update>
+      },
+      {
+        path: '/details/:id',
+        element: <Details></Details>,
+        loader: ({ params }) => fetch(`http://localhost:5000/contact-details/${params.id}`)
+      },
     ]
   }
+  ,
+  {
+    path: '/login',
+    element: <Login></Login>
+  },
+  {
+    path: '/signup',
+    element: <Signup></Signup>
+  },
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+
+    </AuthProvider>
   </React.StrictMode>,
 )

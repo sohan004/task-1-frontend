@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../AuthProvider/AuthProvider';
 
 const options = [
     { value: 'Family', label: 'Family' },
@@ -30,10 +32,17 @@ const Add = () => {
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
+    const [accessType, setAccessType] = useState(null);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const { user, noti, notiLoad, setNotiLoad } = useContext(AuthContext)
+    // console.log(user);
 
 
     const handleAddContact = (e) => {
+        if (!user) {
+            return navigate('/login')
+        }
         setLoading(true);
         if (!name || !phone || !email || !categories) {
             setLoading(false);
@@ -54,7 +63,7 @@ const Add = () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ name, phone, email, categories: categories.value })
+            body: JSON.stringify({ name, phone, email, ownerEmail: user.email, categories: categories.value, accessType: 'Only Me', permission: [], created_at: new Date() })
         })
             .then(res => res.json())
             .then(data => {
@@ -73,6 +82,18 @@ const Add = () => {
                     setPhone('');
                     setEmail('');
                     setCategories(null);
+
+                    fetch('http://localhost:5000/notification', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email: user.email, message: 'New Contact Added', read: false, created_at: new Date(), path: '/my-contact' })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            setNotiLoad(notiLoad + 1)
+                        })
 
                 }
                 setLoading(false);
@@ -122,6 +143,7 @@ const Add = () => {
                                 options={options}
                             />
                         </div>
+                       
 
 
                         <button disabled={loading} onClick={handleAddContact} className="block w-full bg-blue-500 text-white font-bold p-4 rounded-lg">Add Contact</button>
